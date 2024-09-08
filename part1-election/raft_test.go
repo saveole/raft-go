@@ -39,7 +39,7 @@ func TestElectionLeaderAndAnotherDisconnect(t *testing.T) {
 	origLeaderId, _ := h.CheckSingleLeader()
 	h.DisconnectPeer(origLeaderId)
 
-	otherId := (origLeaderId + 1) / 3
+	otherId := (origLeaderId + 1) % 3
 	h.DisconnectPeer(otherId)
 
 	// No quorum
@@ -127,7 +127,7 @@ func TestElectionFollowerComesBack(t *testing.T) {
 
 	origLeaderId, origTerm := h.CheckSingleLeader()
 
-	otherId := (origLeaderId + 1) / 3
+	otherId := (origLeaderId + 1) % 3
 	h.DisconnectPeer(otherId)
 	time.Sleep(650 * time.Millisecond)
 	h.ReconnectPeer(otherId)
@@ -151,7 +151,7 @@ func TestElectionDisconnectLoop(t *testing.T) {
 	for cycle := 0; cycle < 5; cycle++ {
 		leaderId, _ := h.CheckSingleLeader()
 		h.DisconnectPeer(leaderId)
-		otherId := (leaderId + 1) / 3
+		otherId := (leaderId + 1) % 3
 		h.DisconnectPeer(otherId)
 		sleepMs(310)
 		h.CheckNoLeader()
