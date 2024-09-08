@@ -102,9 +102,10 @@ func (s *Server) DisconnectAll() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for id := range s.peerClients {
-		s.peerClients[id].Close()
-		// s.peerClients[id] = nil
-		delete(s.peerClients, id)
+		if s.peerClients[id] != nil {
+			s.peerClients[id].Close()
+			s.peerClients[id] = nil
+		}
 	}
 }
 
