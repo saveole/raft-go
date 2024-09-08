@@ -74,6 +74,7 @@ func (s *Server) Serve() {
 	log.Printf("[%v] listening at %s\n", s.serverId, s.listener.Addr())
 	s.mu.Unlock()
 
+	s.wg.Add(1)
 	go func() {
 		defer s.wg.Done()
 

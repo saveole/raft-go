@@ -152,12 +152,12 @@ func (cm *ConsensusModule) electionTimeout() time.Duration {
 // startElection starts a new election with this CM as a candidate.
 // Expects cm.mu to be locked.
 func (cm *ConsensusModule) startElection() {
-	cm.mu.Lock()
+	cm.state = Candidate
 	cm.currentTerm++
 	savedCurrentTerm := cm.currentTerm
 	cm.electionResetEvent = time.Now()
 	cm.votedFor = cm.id
-	cm.dlog("becomes Candidate, (currentTerm=%d), log=%v", savedCurrentTerm, cm.log)
+	cm.dlog("starting election: becomes Candidate, (currentTerm=%d), log=%v", savedCurrentTerm, cm.log)
 
 	// 自己首先有一票
 	voteReceived := 1
@@ -169,7 +169,7 @@ func (cm *ConsensusModule) startElection() {
 				CandidateId: cm.id,
 			}
 			var reply RequestVoteReply
-			cm.dlog("sending RequestVote to%d: %v", peerId, args)
+			cm.dlog("sending RequestVote to %d: %+v", peerId, args)
 			if err := cm.server.Call(peerId, "ConsensusModule.RequestVote", args, &reply); err == nil {
 				cm.mu.Lock()
 				defer cm.mu.Unlock()
@@ -275,7 +275,7 @@ func (cm *ConsensusModule) Report() (int, int, bool) {
 }
 
 func (cm *ConsensusModule) Stop() {
-	cm.mu.Unlock()
+	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	cm.state = Dead
 	cm.dlog("becomes Dead")
@@ -308,7 +308,7 @@ type RequestVoteReply struct {
 }
 
 func (cm *ConsensusModule) RequestVote(args RequestVoteArgs, reply *RequestVoteReply) error {
-	cm.mu.Unlock()
+	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	if cm.state == Dead {
 		return nil
@@ -329,7 +329,7 @@ func (cm *ConsensusModule) RequestVote(args RequestVoteArgs, reply *RequestVoteR
 		reply.VoteGranted = false
 	}
 	reply.Term = cm.currentTerm
-	cm.dlog("... RequestVote reply %+v", reply)
+	cm.dlog("... RequestVote reply: %+v", reply)
 	return nil
 }
 
@@ -349,7 +349,7 @@ type AppendEntriesReply struct {
 }
 
 func (cm *ConsensusModule) AppendEntries(args AppendEntriesArgs, reply *AppendEntriesReply) error {
-	cm.mu.Unlock()
+	cm.mu.Lock()
 	defer cm.mu.Unlock()
 	if cm.state == Dead {
 		return nil
