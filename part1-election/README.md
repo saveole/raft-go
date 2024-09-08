@@ -23,3 +23,4 @@
 
 - [ ] using protobuf for serialization.
 - [ ] visualize the log to demostrate the whole process.
+- [ ] fix `go test` FAIL.
