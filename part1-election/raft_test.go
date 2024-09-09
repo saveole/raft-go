@@ -119,6 +119,8 @@ func TestElectionLeaderDisconnectThenReconnect5(t *testing.T) {
 	}
 }
 
+// go test -v -race -run TestElectionFollowerComesBack |& tee tlfcb.log
+// go run ../tools/log2html/main.go < tlfcb.log
 func TestElectionFollowerComesBack(t *testing.T) {
 	defer leaktest.CheckTimeout(t, 100*time.Millisecond)()
 
