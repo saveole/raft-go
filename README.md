@@ -12,3 +12,10 @@
 
 #### References
 - [Raft](https://raft.github.io/)
+
+#### 可视化
+
+```go
+go test -run TestElectionFollowerComesBack |& tee cb.log
+go run ../tools/log2html/main.go < cb.log
+```
