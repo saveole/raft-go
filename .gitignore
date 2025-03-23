@@ -1,2 +1,3 @@
 *.log
 *.html
+.DS_Store
